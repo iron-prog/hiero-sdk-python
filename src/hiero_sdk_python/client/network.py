@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import secrets
 import time
 from typing import Any
@@ -11,6 +12,9 @@ import requests
 from hiero_sdk_python.account.account_id import AccountId
 from hiero_sdk_python.address_book.node_address import NodeAddress
 from hiero_sdk_python.node import _Node
+
+
+logger = logging.getLogger(__name__)
 
 
 class Network:
@@ -165,7 +169,7 @@ class Network:
         """
         base_url: str | None = self.MIRROR_NODE_URLS.get(self.network)
         if not base_url:
-            print(f"No known mirror node URL for network='{self.network}'. Skipping fetch.")
+            logger.warning("No known mirror node URL for network='%s'. Skipping fetch.", self.network)
             return []
 
         url: str = f"{base_url}/api/v1/network/nodes?limit=100&order=desc"
@@ -186,7 +190,7 @@ class Network:
 
             return nodes
         except requests.RequestException as e:
-            print(f"Error fetching nodes from mirror node API: {e}")
+            logger.error("Error fetching nodes from mirror node API: %s", e)
             return []
 
     def _fetch_nodes_from_default_nodes(self) -> list[_Node]:
